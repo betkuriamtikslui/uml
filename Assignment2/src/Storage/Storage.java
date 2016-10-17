@@ -26,7 +26,6 @@ public class Storage  {
 			while(in.hasNext()){
 				member = in.nextLine();
 				String[] memberInfo = member.split(">")[0].split("#");	//gets name id and uniqueID
-				System.out.println(member.split(">").length);
 				Member m = new Member(memberInfo[0], memberInfo[1], memberInfo[2]);
 				memberList.add(m);
 				String[] boats = member.split(">");
@@ -38,7 +37,6 @@ public class Storage  {
 						try{
 							m.addBoat(new Boat(Double.parseDouble(boatInfo[0]), BoatEnum.valueOf(boatInfo[1])));
 						}catch(Exception e){
-							System.out.println("unable to add");
 						}
 					}
 				}

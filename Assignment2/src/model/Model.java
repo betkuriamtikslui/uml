@@ -4,13 +4,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
+import java.util.LinkedList;
+import java.util.List;
 import Boat.Boat;
-import Evaluate.Evaluate;
-import Exceptions.WrongQueryException;
 import People.Member;
 
 public class Model {
@@ -73,137 +69,76 @@ public class Model {
 		return verboseList;
 	}
 	
-//	protected String[][] getCommands(String[] argument){
-//		String[] results = new String[argument.length];
-//
-//		
-//		
-//		return results;
-//	}
+	
+	public ArrayList<String> getVerboseList(LinkedList<Member> list) {
+		ArrayList<String> verboseList = new ArrayList<String>();
+		String message;
+		for (Member member : list) {
+			message = member.getName() + " " + member.getUniqueID() + " " + member.getPersonalID();
+			verboseList.add(message);
+			message = "Ships: ";
+			for (Boat boat : member.getBoatList()) {
+				message += boat.getType().toString() + " " + boat.getLength();
+				verboseList.add(message);
+				message = "";
+			}
+		}
+		return verboseList;
+	}
 	
 	
-//	public ArrayList<Member> Query(String query) {
-//		ArrayList<Member> list = new ArrayList<Member>(); // copy
-//															// memberList
-//		// should look at name
-//		// uniqueID
-//		// id
-//		// age
-//		// day,month,year
-//		// boat Number
-//		Evaluate eval = new Evaluate();
-//		Matcher m;
-//		
-//		
-//		
-//		
-//		String[] results = new String[temp.length];
-//		String queryCopy = "";
-//		queryCopy = String.valueOf(query);
-//		queryCopy = queryCopy.replaceAll("^\\s|\n\\s|\\s$", "");
-//		queryCopy = queryCopy.replaceAll("[^0-9a-zA-Z:-]+", ",");
-//		String[] temp = queryCopy.split(","); // splits by commas so the result
-//												// of spliting
-//												// name:someName,age:17,
-//												// would be name:someName in 0
-//												// place
-//												// annd age1 in 1;
-//
-//		String[][] commands = new String[temp.length][2];
-//		for (int i = 0; i < temp.length; i++) {
-//			if (temp[i] != "") {
-//				commands[i][0] = temp[i].split(":")[0];
-//				commands[i][1] = temp[i].split(":")[1];
-//			}
-//		}
-//
-//		for (Member member : memberList) { // loop through all members
-//			for (int i = 0; i < commands.length; i++) { // loop through all
-//														// commands which were
-//														// passed
-//				String pattern = commands[i][1];
-//				Pattern p = Pattern.compile(pattern); // creates
-//														// pattern
-//				switch (commands[i][0]) { // switch between all
-//											// commands
-//				case "name":
-//					m = p.matcher(member.getName()); // matches to name of
-//														// member
-//					if (m.find()) {
-//						results[i] = "true";
-//					}
-//					break;
-//				// case "ID":
-//				// m = p.matcher(member.getUniqueID());
-//				// if (m.find()) {
-//				// results[i] = "true";
-//				// }
-//				// break;
-//				case "personalID":
-//					m = p.matcher(member.getDay());
-//					if (m.find()) {
-//						results[i] = "true";
-//					}
-//					break;
-//
-//				case "birthday":
-//					if (member.getDay().equals(commands[i][1])) {
-//						results[i] = "true";
-//
-//					}
-//					break;
-//
-//				case "birthMonth":
-//					if (member.getMonth().equals(commands[i][1])) {
-//						results[i] = "true";
-//
-//					}
-//					break;
-//				case "birthYear":
-//					if (member.getYear().equals(commands[i][1])) {
-//						results[i] = "true";
-//					}
-//					break;
-//				case "numberOFBoats:":
-//					m = p.matcher(Integer.toString(member.getBoatList().size())); // matches
-//																					// to
-//																					// name
-//																					// of
-//					if (m.find()) {
-//						results[i] = "true";
-//					}
-//					break;
-//
-//				default:
-//
-//				}
-//			}
-//			System.out.println(Arrays.toString(results));
-//			if (eval.eval(replace(query, temp, results))) {
-//				list.add(member);
-//			}
-//		}
-//
-//		return list;
-//
-//	}
 
-	private String replace(String original, String[] toBeReplaced, String[] newValues) {
-		for (int i = 0; i < toBeReplaced.length; i++) {
-
-			original.replace(toBeReplaced[i], newValues[i]);
+	public ArrayList<String> advancedSearch(String query){
+		LinkedList<Member> list = new LinkedList<Member>();
+		//name=Somename; boatNumber="5"
+		String[] queryArray = query.split(";");
+		String[][] arr = new String[queryArray.length][2];
+		
+		String[] temp;
+		for(int i = 0; i< queryArray.length; i++){
+			temp = queryArray[i].split("=");
+			arr[i][0] = temp[0];
+			arr[i][1] = temp[1];
+			
 			
 		}
-		System.out.println("replace + " + original);
+		temp = null;//clean temp
+		for(Member member:memberList){
+			boolean has = true;
+			for(int i = 0; i< arr.length; i++){
+				if(has == false){
+					break;
+				}
+				switch(arr[i][0].toLowerCase()){
+				
+				case "name":
+					
+					if(!member.getName().contains(arr[i][1])){
+						has=false;
+					}
+					break;
+				case "numberofboats":
+					if(member.getBoatList().size() != Integer.parseInt(arr[i][1])){
+						has = false;
+					}
+					break;
+					
+				
+				}
+			}
+			if(has){
+				list.add(member);
+			}
+		}
 
-		return original;
+		
+		return getVerboseList(list);
 	}
-
+	
 	
 
 	public boolean deleteMember(String name) {
 		for (Member member : memberList) {
-			System.out.println(member.getName());
 			if (member.getName().equals(name) ) {
 				memberList.remove(member);
 				return true;
@@ -263,5 +198,18 @@ public class Model {
 
 	public void addMember(Member member) {
 		memberList.add(member);
+	}
+
+	public ArrayList<String> search(String name) {
+		LinkedList<Member> list = new LinkedList<Member>();
+		for(Member member:memberList){
+			boolean add = true;
+			if(member.getName().equals(name)){
+				list.add(member);
+			}
+				
+		}
+		
+		return getVerboseList(list);
 	}
 }

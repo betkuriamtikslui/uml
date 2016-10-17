@@ -1,8 +1,8 @@
 package controller;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import Boat.Boat;
 import Boat.BoatEnum;
@@ -29,7 +29,7 @@ public class MemberController {
 			{ "deleteboat", "deleteboat length type" }, {"listBoats", "listBoats"}};
 	private String[][] secretaryList = { { "verboseList", "verboseList" }, { "compactList", "compactList" },
 			{ "createMember", "createMember name personalid" }, { "deleteMember", "deleteMember {name} {personalID}" },
-			{ "logout", "logout" } };
+			{ "logout", "logout" },{"search", "search {name}}"}};
 
 	public MemberController() {
 		store = new Storage();
@@ -89,13 +89,13 @@ public class MemberController {
 			view.print("List of commands");
 			view.print("---------------------------------------------");
 			if (session != null) {
-				System.out.println(session.getName());
+				view.print(session.getName());
 				for (int i = 0; i < loggedCommandList.length; i++) {
 					view.print(loggedCommandList[i][1]);
 				}
 
 			} else if (admin != null) {
-				System.out.println("logged in as secretary");
+				view.print("You are logged in as secretary");
 				for (int i = 0; i < secretaryList.length; i++) {
 					view.print(secretaryList[i][1]);
 				}
@@ -135,6 +135,7 @@ public class MemberController {
 				break;
 			case "verboseList":
 				view.print(model.getVerboseList());
+				
 				break;
 			case "compactList":
 				view.print(model.getCompactList());
@@ -144,7 +145,9 @@ public class MemberController {
 				if (values.length == 3 && admin != null) {
 					try {
 						model.addMember(values[1], values[2]);
-						view.print("Member was added successfully!");						
+						view.print("Member was added successfully!");	
+						store.saveLst(model.getMemberList());
+
 					} catch (Exception e) {
 						view.print("unable to add member");
 					}
@@ -156,14 +159,17 @@ public class MemberController {
 			case "deleteMember":
 				if( admin != null){
 					model.deleteMember(values[1]);
-					
+					store.saveLst(model.getMemberList());
+
 				}
 				break;
 			case "addBoat":
 				try{
 				session.addBoat(new Boat(Double.parseDouble(values[1]),BoatEnum.valueOf(values[2])));
 				
-				System.out.println("added");
+				view.print("added");
+				store.saveLst(model.getMemberList());
+
 				}catch(Exception e){
 					view.print("We were not able to add your boat");
 				}
@@ -173,6 +179,8 @@ public class MemberController {
 					if(values.length != 5){
 						if(model.editMemberInfo(values[1], values[2], values[3], values[4])){
 							view.print("Information was change succesfully");
+							store.saveLst(model.getMemberList());
+
 						}else{
 							view.print("we were not able to change information, either user does not exist or the information given is wrong");
 						}
@@ -191,6 +199,7 @@ public class MemberController {
 			case "deleteBoat":
 				if(session != null && values.length == 3){
 					if(session.deleteBoat(BoatEnum.valueOf(values[2]), Double.parseDouble(values[1]))){
+						store.saveLst(model.getMemberList());
 						view.print("Boat was deleted");
 					}else{
 						view.print("we were not able to delete boat");
@@ -201,6 +210,7 @@ public class MemberController {
 			case "editBoat":
 				if(session != null && values.length == 5){
 					if(session.editBoat(Double.parseDouble(values[1]), BoatEnum.valueOf(values[2]), Double.parseDouble(values[3]), BoatEnum.valueOf(values[4]))){
+						store.saveLst(model.getMemberList());
 						view.print("Boat was deleted");
 					}else{
 						view.print("we were not able to delete boat");
@@ -211,6 +221,30 @@ public class MemberController {
 				go = false;
 				view.print("Saving files");
 				store.saveLst(model.getMemberList());
+				break;
+			case "search":
+				ArrayList<String> list;
+				if(admin != null && values.length ==2){
+					list = model.search(values[1]);
+					view.print(list);
+				}
+				
+				break;
+			case "queryExample":
+				view.print("********************");
+				
+				view.print("queryExample");
+				
+				view.print("number of obats is 3");
+				view.print( model.advancedSearch("numberofboats=3"));
+				view.print("********************");
+				view.print("name contains ni chars");
+
+				view.print( model.advancedSearch("name=ni"));
+				view.print("********************");
+				view.print("name contaisn jj number of boats = 3");
+				view.print( model.advancedSearch("name=jj;numberofBoats=3"));
+				view.print("********************");
 				break;
 			default:
 				view.print("Illegal command");
