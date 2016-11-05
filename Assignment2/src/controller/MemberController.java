@@ -21,16 +21,7 @@ public class MemberController {
 	private Secretary admin;
 	private static boolean go;
 	private Storage store;
-	private String[][] notLoggedCommandList = { { "login", "login {name}" }, { "verboseList", "verboseList" },
-			{ "compactList", "compactList" } ,{"quit", "{quit} --quit and save "}};
-	private String[][] loggedCommandList = { { "verboseList", "verboseList" }, { "compactList", "compactList" },
-			{ "logout", "logout" }, { "addBoat", "addboat length type" }, { "logout", "logout" },
-			{ "editBoat", "editBoat, {boatlength} {boattype} {newLength}  {newType}" },
-			{ "deleteboat", "deleteboat length type" }, {"listBoats", "listBoats"}};
-	private String[][] secretaryList = { { "verboseList", "verboseList" }, { "compactList", "compactList" },
-			{ "createMember", "createMember name personalid" }, { "deleteMember", "deleteMember {name} {personalID}" },
-			{ "logout", "logout" },{"search", "search {name}}"}};
-
+	
 	public MemberController() {
 		store = new Storage();
 		ArrayList<Member> list = store.getMemberList();
@@ -41,15 +32,6 @@ public class MemberController {
 		}
 		view = new View();
 		go = true;
-	}
-
-	// member Methods
-	public void addMember(String name, String id) {
-		// if(model.addMember(name, id)){
-		// view.print(created);
-		// }else{
-		// view.print(wrongDate);
-		// }
 	}
 
 	public void authentificate(String name) {
@@ -85,29 +67,19 @@ public class MemberController {
 		String[] values;
 		
 		while (go) {
-			view.print("---------------------------------------------");
-			view.print("List of commands");
-			view.print("---------------------------------------------");
+			view.clearScreen();
+			view.printListOfCommands();
 			if (session != null) {
 				view.print(session.getName());
-				for (int i = 0; i < loggedCommandList.length; i++) {
-					view.print(loggedCommandList[i][1]);
-				}
 
 			} else if (admin != null) {
-				view.print("You are logged in as secretary");
-				for (int i = 0; i < secretaryList.length; i++) {
-					view.print(secretaryList[i][1]);
-				}
+				view.loggedInAsSecretary();
+				
 
-			} else {
-				for (int i = 0; i < notLoggedCommandList.length; i++) {
-					view.print(notLoggedCommandList[i][1]);
-				}
 			}
-			values = view.getCommand("Enter Command").split(" ");
-			view.print("---------------------------------------------");
-
+			view.printListOfCommands();
+			
+			values = view.getCommand();
 			switch (values[0]) {
 			case "login":
 				if (admin == null && session == null) {
@@ -115,13 +87,14 @@ public class MemberController {
 						if (values[1].equals("secretary")) {
 							admin = new Secretary("", "");
 						} else {
+							System.out.println(values[1]);
 							authentificate(values[1]);
 						}
 					} catch (Exception e) {
-						view.print("invalid parameter");
+						view.invalidParameters();
 					}
 				} else {
-					view.print("You are already logged in");
+					view.printLoggedInAlready();
 				}
 				break;
 			case "logout":
@@ -129,30 +102,30 @@ public class MemberController {
 					admin = null;
 					session = null;
 				} else {
-					view.print("you are not logged in");
+					view.notLoggedin();
 				}
 
 				break;
 			case "verboseList":
-				view.print(model.getVerboseList());
-				
+				view.verboseList(model.getMemberList());
 				break;
 			case "compactList":
-				view.print(model.getCompactList());
+				view.compactList(model.getMemberList());
+				
 				break;
 
 			case "createMember":
 				if (values.length == 3 && admin != null) {
 					try {
 						model.addMember(values[1], values[2]);
-						view.print("Member was added successfully!");	
+						view.memberAddedSuccessfully();	
 						store.saveLst(model.getMemberList());
 
 					} catch (Exception e) {
 						view.print("unable to add member");
 					}
 				} else {
-					view.print("Wrong parameters");
+					view.invalidParameters();
 				}
 				break;
 				
@@ -167,42 +140,42 @@ public class MemberController {
 				try{
 				session.addBoat(new Boat(Double.parseDouble(values[1]),BoatEnum.valueOf(values[2])));
 				
-				view.print("added");
+				view.boatAdded();
 				store.saveLst(model.getMemberList());
 
 				}catch(Exception e){
-					view.print("We were not able to add your boat");
+					view.boatWasNotAdded();
 				}
 				break;
 			case "editMember":
 				if(admin != null){
 					if(values.length != 5){
 						if(model.editMemberInfo(values[1], values[2], values[3], values[4])){
-							view.print("Information was change succesfully");
+							view.informationWasChanged();
 							store.saveLst(model.getMemberList());
 
 						}else{
-							view.print("we were not able to change information, either user does not exist or the information given is wrong");
+							view.informationWasNotChanged();
 						}
 					}else{
-						view.print("Wrong arguments");
+						view.invalidParameters();
 					}
 				}else{
-					view.print("You do not have permissions to change info");
+					view.dontHavePermission();
 				}
 				break;
 				
 			case "listBoats":
-				view.print(session.getStringBoatList());
+				view.boatList(session.getBoatList());
 				break;
 				
 			case "deleteBoat":
 				if(session != null && values.length == 3){
 					if(session.deleteBoat(BoatEnum.valueOf(values[2]), Double.parseDouble(values[1]))){
 						store.saveLst(model.getMemberList());
-						view.print("Boat was deleted");
+						view.operationWasSuccessfull();
 					}else{
-						view.print("we were not able to delete boat");
+						view.informationWasNotChanged();
 					}
 				}
 				break;
@@ -219,8 +192,9 @@ public class MemberController {
 				break;
 			case "quit":
 				go = false;
-				view.print("Saving files");
 				store.saveLst(model.getMemberList());
+				view.savingFiles();
+
 				break;
 			case "search":
 				ArrayList<String> list;
@@ -230,22 +204,22 @@ public class MemberController {
 				}
 				
 				break;
-			case "queryExample":
-				view.print("********************");
-				
-				view.print("queryExample");
-				
-				view.print("number of obats is 3");
-				view.print( model.advancedSearch("numberofboats=3"));
-				view.print("********************");
-				view.print("name contains ni chars");
-
-				view.print( model.advancedSearch("name=ni"));
-				view.print("********************");
-				view.print("name contaisn jj number of boats = 3");
-				view.print( model.advancedSearch("name=jj;numberofBoats=3"));
-				view.print("********************");
-				break;
+//			case "queryExample":
+//				view.print("********************");
+//				
+//				view.print("queryExample");
+//				
+//				view.print("number of obats is 3");
+//				view.print( model.advancedSearch("numberofboats=3"));
+//				view.print("********************");
+//				view.print("name contains ni chars");
+//
+//				view.print( model.advancedSearch("name=ni"));
+//				view.print("********************");
+//				view.print("name contaisn jj number of boats = 3");
+//				view.print( model.advancedSearch("name=jj;numberofBoats=3"));
+//				view.print("********************");
+//				break;
 			default:
 				view.print("Illegal command");
 			}

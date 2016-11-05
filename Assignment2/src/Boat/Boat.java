@@ -29,8 +29,5 @@ public class Boat {
 		this.length = length;
 	}
 
-	public String toString() {
-		String s = "Boats type is" + type + ",and boats length is:" + length;
-		return s;
-	}
+
 }

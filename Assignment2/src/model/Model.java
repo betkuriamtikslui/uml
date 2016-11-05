@@ -42,33 +42,7 @@ public class Model {
 		return false;
 	}
 	
-	public ArrayList<String> getCompactList() {
-		
-		ArrayList<String> compactList = new ArrayList<String>();
-		String message;
-		for (Member member : memberList) {
-			message = member.getName() + " " + member.getUniqueID() + " " + member.getBoatList().size();
-			compactList.add(message);
-		}
-		return compactList;
-	}
 
-	public ArrayList<String> getVerboseList() {
-		ArrayList<String> verboseList = new ArrayList<String>();
-		String message;
-		for (Member member : memberList) {
-			message = member.getName() + " " + member.getUniqueID() + " " + member.getPersonalID();
-			verboseList.add(message);
-			message = "Ships: ";
-			for (Boat boat : member.getBoatList()) {
-				message += boat.getType().toString() + " " + boat.getLength();
-				verboseList.add(message);
-				message = "";
-			}
-		}
-		return verboseList;
-	}
-	
 	
 	public ArrayList<String> getVerboseList(LinkedList<Member> list) {
 		ArrayList<String> verboseList = new ArrayList<String>();

@@ -32,13 +32,6 @@ public class Member extends Person{
 		return false;
 	}
 	
-	public ArrayList<String> getStringBoatList(){
-		ArrayList<String> list = new ArrayList<String>();
-		for(Boat boat: boatList){
-			list.add(boat.getType() + " "+ boat.getLength());
-		}
-		return list;
-	}
 	public boolean  editBoat(double oldLength, BoatEnum oldType,  double newLength, BoatEnum newType){
 		for(Boat boat: boatList){
 			if(boat.getLength() == oldLength && boat.getType() == oldType){
