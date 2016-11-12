@@ -5,5 +5,5 @@ import BlackJack.model.Player;
 
 public interface WinRule {
 
-	public boolean playerWon(Dealer a_dealer, Player a_player);
+	public boolean isDealerWinner(Dealer a_dealer, Player a_player);
 }

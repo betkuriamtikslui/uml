@@ -72,4 +72,28 @@ public class SwedishView implements IView
             System.out.println("Poäng: " + a_score);
             System.out.println("");
         }
+
+		@Override
+		public boolean selectNewGame(int input) {
+			// TODO Auto-generated method stub
+			return input == 'j';
+		}
+
+		@Override
+		public boolean selectStand(int input) {
+			// TODO Auto-generated method stub
+			return input == 's';
+		}
+
+		@Override
+		public boolean selectHit(int input) {
+			// TODO Auto-generated method stub
+			return input == 'n';
+		}
+
+		@Override
+		public boolean selectQuit(int input) {
+			// TODO Auto-generated method stub
+			return input == 'a';
+		}
     }

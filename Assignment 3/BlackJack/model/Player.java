@@ -13,16 +13,11 @@ public class Player implements Subject {
 
 		m_hand = new LinkedList<Card>();
 		list = new LinkedList<Observer>();
-		System.out.println("Hello List World");
+		
 	}
 
 	public void DealCard(Card a_addToHand) {
 		m_hand.add(a_addToHand);
-		try {
-			Thread.sleep(2000);
-		} catch (InterruptedException e) {
-		
-		}
 		notifyObserver();
 	}
 

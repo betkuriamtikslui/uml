@@ -55,4 +55,27 @@ public class SimpleView implements IView {
 		}
 
 	}
+	@Override
+	public boolean selectNewGame(int input) {
+		// TODO Auto-generated method stub
+		return input == 'p';
+	}
+
+	@Override
+	public boolean selectStand(int input) {
+		// TODO Auto-generated method stub
+		return input == 's';
+	}
+
+	@Override
+	public boolean selectHit(int input) {
+		// TODO Auto-generated method stub
+		return input == 'h';
+	}
+
+	@Override
+	public boolean selectQuit(int input) {
+		// TODO Auto-generated method stub
+		return input == 'q';
+	}
 }

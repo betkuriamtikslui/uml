@@ -1,12 +1,10 @@
 package BlackJack.model;
 
-import BlackJack.model.rules.WinRule;
-
 public class Game{
 
 	private Dealer m_dealer;
 	private Player m_player;
-	private WinRule winRule;
+	
 	public Game() {
 		m_dealer = new Dealer(new BlackJack.model.rules.RulesFactory());
 		m_player = new Player();
